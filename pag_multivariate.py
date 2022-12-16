@@ -4,6 +4,7 @@ from datetime import date, datetime
 import matplotlib.pyplot as plt
 from meteostat import Point, Daily
 import plotly.graph_objects as go
+import seaborn as sns
 
 def main():
     pd.options.display.float_format = '{:,.1f}'.format
@@ -201,7 +202,7 @@ def main():
 
     corr_matrix_t2 = dataframe_t2.corr()
 
-    heatmap = sn.heatmap(corr_matrix_t2, annot=True)
+    heatmap = sns.heatmap(corr_matrix_t2, annot=True)
 
     st.pyplot(heatmap.figure)
 

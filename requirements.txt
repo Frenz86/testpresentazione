@@ -10,3 +10,4 @@ prophet
 statsmodels
 openpyxl
 meteostat
+seaborn
