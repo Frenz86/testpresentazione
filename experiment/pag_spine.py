@@ -4,8 +4,9 @@ from prophet.plot import plot_plotly
 import joblib
 from pandas.plotting import lag_plot
 from statsmodels.tsa.stattools import acf
-from prophet.diagnostics import cross_validation, performance_metrics
+from prophet.diagnostics import cross_validation,performance_metrics
 from datetime import date
+
 
 def main():
     pd.options.display.float_format = '{:,.1f}'.format
@@ -18,6 +19,7 @@ def main():
     df_spine = df_spine.drop('Calendario',axis=1)
     quante = st.slider("Selezionare la dimensione del dataset",100,len(df_spine),250)
     df_spine = df_spine[['Data','Quantita']]
+    #df_spine['Quantita']=round(df_spine['Quantita'])
     df_spine['Data'] = pd.to_datetime(df_spine['Data']).dt.date
     df_spine['Data']=pd.to_datetime(df_spine['Data'],format='%Y/%m/%d')
     df_spine['Data']=df_spine['Data'].dt.strftime('%d/%m/%Y')
@@ -34,45 +36,46 @@ def main():
     isto = df_spine['Quantità'].plot(kind='hist', bins=bins_scelti)
     st.pyplot(isto.figure,clear_figure=True)
 
-    st.subheader('Lag plot delle spine')
-    st.write ("""Un lag plot è un grafico utilizzato in statistica per individuare la presenza di autocorrelazione nei dati. L'autocorrelazione si riferisce alla dipendenza tra gli elementi di una serie temporale, ossia alla presenza di una relazione tra i valori di una variabile a distanza di un certo intervallo di tempo (detto lag). Se ad esempio utilizziamo un lag di 7 giorni, il primo punto avrà coordinate u = y(1) e v = y(1+7) = y(8), il secondo punto u = y(2) e v = y(2+7) = y(9) e così via, dove y(t) in questo caso è il numero di spine vendute al tempo t. Idealmente l'autocorrelazione è, in valore assoluto, uguale a 1, che è il caso in cui tutti i punti giacciono sulla stessa retta.\nTuttavia, è importante ricordare che il lag plot è tanto più inaffidabile quanto più è alto il numero di giorni mancanti nel dataset.""")
-    lag = int(st.text_input(f'Scegli il lag (dev\'essere un numero intero compreso tra 1 e 365)',value=1))
-    if (lag>365) or (lag<1):
-        st.write(f'Devi inserire un numero intero compreso tra 1 e 365!')
+    st.subheader('Lag plot originale sulle spine')
+    st.write ("""lag plot----blablab bla....descrivete ogni plot cosa rappresenta, bla bla bla bla bla bla bla bla bla bla bla bla
+                bla bla bla bla bla bla bla bla bla bla bla bla
+                bla bla bla bla bla bla bla bla bla bla bla bla
+                bla bla bla bla bla bla bla bla bla bla bla bla
+                bla bla bla bla bla bla bla bla bla bla bla bla
+                """)
+    lag = int(st.text_input(f'Scegli il lag (dev\'essere un numero intero compreso tra 1 e {len(df_spine)-1}!)',value=1))
+    if (lag>len(df_spine)-1) or (lag < 1):
+        st.write(f'Inserire un numero di giorni non troppo elevato (tra 1 e 100)')
     else:
         grafico_lag = lag_plot(df_spine['Quantità'],lag)
         st.pyplot(grafico_lag.figure,clear_figure=True)
 
         autocorrelation_vet = acf(df_spine['Quantità'],nlags=lag)
         autocorrelation = autocorrelation_vet[-1]
-        st.write(f'L\'autocorrelazione di questo lag plot è del {round(100*autocorrelation,2)}%')    
+        st.write(f'L\'autocorrelazione di questo lag plot è del {round(100*autocorrelation,2)}%')
+    
 
     st.subheader('Dataset senza outliers')
-    mean = df_spine['Quantità'].mean()
-    std = df_spine['Quantità'].std()
-    upper = mean + 2 * std 
-    lower = mean - 2 * std
-    df_spine_rid = df_spine[(df_spine['Quantità']<upper) & (df_spine['Quantità']>lower)]
+    df_spine_rid = df_spine[(df_spine['Quantità']<370) & (df_spine['Quantità']>10)]
     df_spine_rid = df_spine_rid.reset_index()
     df_spine_rid = df_spine_rid.drop('index',axis=1)
-    quante2 = st.slider("Selezionare la dimensione del dataset",100,len(df_spine_rid),250)
+    quante2 = st.slider("Selezionare la dimensione del dataset.",100,len(df_spine),250)
     st.dataframe(df_spine_rid.head(quante2))
-    st.write("""Per evitare di considerare valori troppo grandi o troppo piccoli (outliers) che rischiano di fuorviare le previsioni, sono stati utilizzati solo i dati contenuti entro 2 deviazioni standard dalla media""")
 
     st.subheader('Tabella statistica riassuntiva senza outliers')
     st.dataframe(df_spine_rid.describe().T)
 
-    st.subheader('Istogramma delle spine senza outliers')
+    st.subheader('Istogramma sulle spine senza outliers')
     bins_scelti2 = st.slider(
         'Selezionare il numero bins',
         40, 100, 60)
     isto2 = df_spine_rid['Quantità'].plot(kind='hist', bins=bins_scelti2)
     st.pyplot(isto2.figure,clear_figure=True)
 
-    st.subheader('Lag plot delle spine senza outliers')
-    lag2 = int(st.text_input(f'Scegli il lag (dev\'essere un numero intero compreso tra 1 e 365)',value=7))
-    if (lag2>365) or (lag2<1):
-        st.write(f'Devi inserire un numero intero compreso tra 1 e 365!')
+    st.subheader('Lag plot sulle spine senza outliers')
+    lag2 = int(st.text_input(f'Scegli il lag (dev\'essere un numero intero compreso tra 1 e {len(df_spine_rid)-1}!)',value=1))
+    if (lag2>len(df_spine_rid)-1) or (lag2 < 1):
+        st.write(f'Devi inserire un numero compreso tra 1 e {len(df_spine_rid)-1}!')
     else:
         grafico_lag2 = lag_plot(df_spine_rid['Quantità'],lag2)
         st.pyplot(grafico_lag2.figure,clear_figure=True)
@@ -84,14 +87,14 @@ def main():
     model = joblib.load('model_spine.pkl')
 
     st.subheader('Componenti delle spine senza outliers')
-    quanto_trend = st.slider('Scegliere il numero di giorni di cui vedere le componenti future',0,180,60)
+    quanto_trend = st.slider('Scegliere il numero di giorni per verificare i diversi trend',7,180,60)
     future = model.make_future_dataframe(periods=quanto_trend)
     forecast = model.predict(future)
     comp = model.plot_components(forecast)
     st.pyplot(comp.figure,clear_figure=True)
 
     st.subheader('Forecasting')
-    da_pred = st.slider('Scegliere il numero di giorni da prevedere',0,180,60)
+    da_pred = st.slider('Scegliere il numero di gironi di Forecast',7,180,60)
     future = model.make_future_dataframe(da_pred, freq='D')
     forecast = model.predict(future)
     fig = plot_plotly(model, forecast)
@@ -100,7 +103,7 @@ def main():
                     xaxis_title="Data",
                     )
     fig.add_vline(x=date.today(), line_width=3, line_dash="dash", line_color="red")
-    fig.update_layout(width=1200)
+    fig.update_layout(width=1600)
     st.plotly_chart(fig)
 
     df_cv_final=cross_validation(model,
