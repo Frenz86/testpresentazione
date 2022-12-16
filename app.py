@@ -4,6 +4,7 @@ from pag_burger import main as pag_burger
 from pag_fritti import main as pag_fritti
 from pag_cocktail import main as pag_cocktail
 from pag_bar import main as pag_bar
+from pag_multivariate import main as pag_multivariate
 
 
 def main():
@@ -19,7 +20,7 @@ def main():
 	st.image(image, caption='',use_column_width=True)
 
 				
-	pag_name = ["Spine","Burger","Fritti","Cocktail","Bar"]
+	pag_name = ["Spine","Burger","Fritti","Cocktail","Bar","Multivariate"]
 	
 	OPTIONS = pag_name
 	st.subheader('Seleziona la categoria di interesse') 
@@ -35,6 +36,8 @@ def main():
 		pag_cocktail()
 	elif sim_selection == pag_name[4]:
 		pag_bar()
+	elif sim_selection == pag_name[5]:
+		pag_multivariate()
 	else:
 		st.markdown("Something went wrong. We are looking into it.")
 
