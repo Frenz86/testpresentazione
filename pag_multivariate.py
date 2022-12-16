@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import date, datetime
 import matplotlib.pyplot as plt
 from meteostat import Point, Daily
-import seaborn as sn
 import plotly.graph_objects as go
 
 def main():
